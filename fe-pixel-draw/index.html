@@ -1,0 +1,41 @@
+<html>
+  <head>
+    <script type="text/javascript">
+      const ws = new WebSocket('ws://localhost:8080');
+
+      // Browser WebSockets have slightly different syntax than `ws`.
+      // Instead of EventEmitter syntax `on('open')`, you assign a callback
+      // to the `onopen` property.
+
+      const addBox = function({x,y}) {
+        var elem = document.createElement('div');
+        elem.style.cssText = 'position:absolute;width: 10px;height:10px;opacity:0.3;background:red;';
+        elem.style.left = x + "px";
+        elem.style.top = y + "px";
+        document.body.appendChild(elem);
+      }
+
+      ws.onopen = function() {
+        document.addEventListener("click", function(e) {
+            const msg = JSON.stringify({
+                x: e.clientX,
+                y: e.clientY
+            })
+            ws.send(msg);
+        })
+      };
+
+      ws.onmessage = function(msg) {
+          msg.data.text().then(function(text){
+              const data = JSON.parse(text)
+              addBox(data)        
+          })
+      };
+
+
+    </script>
+  </head>
+  <body>
+
+  </body>
+</html>
